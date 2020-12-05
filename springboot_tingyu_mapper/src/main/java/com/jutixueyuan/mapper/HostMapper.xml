@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jutixueyuan.mapper.HostMapper">
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.jutixueyuan.pojo.Host">
+        <id column="hid" property="hid"/>
+        <result column="hname" property="hname"/>
+        <result column="hpwd" property="hpwd"/>
+        <result column="hphone" property="hphone"/>
+        <result column="starttime" property="starttime"/>
+        <result column="status" property="status"/>
+        <result column="strong" property="strong"/>
+        <result column="ordernumber" property="ordernumber"/>
+        <!--   Host 中有 hostpower 一对一的映射      -->
+        <association property="hostPower" javaType="com.jutixueyuan.pojo.HostPower">
+            <id column="hpid" property="hpid"/>
+            <result column="hpstar" property="hpstar"/>
+            <result column="hpstart_begindate" property="hpstartBegindate"/>
+            <result column="hpstar_enddate" property="hpstarEnddate"/>
+            <result column="hp_order_power" property="hpOrderPower"/>
+            <result column="hpstar_begintime" property="hpstarBegintime"/>
+            <result column="hpstar_endtime" property="hpstarEndtime"/>
+            <result column="hpdiscount" property="hpdiscount"/>
+            <result column="hp_dis_starttime" property="hpDisStarttime"/>
+            <result column="hp_dis_endtime" property="hpDisEndtime"/>
+            <result column="hpprice" property="hpprice"/>
+            <result column="hpcosts" property="hpcosts"/>
+            <result column="hostid" property="hostid"/>
+        </association>
+    </resultMap>
+
+    <select id="selectHost" resultMap="BaseResultMap">
+        select * from t_host h LEFT JOIN t_host_power p
+        on h.hid = p.hostid
+        <!--        动态的sql -->
+        <where>
+            <!--            条件hname -->
+            <if test="hostCondition.hname != null and hostCondition.hname != ''">
+               and h.hname like concat('%',#{hostCondition.hname},'%')
+            </if>
+            <!--            条件status -->
+            <if test="hostCondition.status != null and hostCondition.status != ''">
+                and h.status = #{hostCondition.status}
+            </if>
+
+            <!--            条件hpstar -->
+            <if test="hostCondition.hpstar != null and hostCondition.hpstar != ''">
+              and  p.hpstar = #{hostCondition.hpstar}
+            </if>
+
+            <!--            条件hpdiscount -->
+            <if test="hostCondition.hpdiscount != null and hostCondition.hpdiscount != ''">
+               and p.hpdiscount = #{hostCondition.hpdiscount}
+            </if>
+
+        </where>
+
+            order by h.strong
+
+        <!--            条件strong 排序 -->
+        <if test="hostCondition.strong != null and hostCondition.strong != ''">
+            ${hostCondition.strong}
+        </if>
+
+    </select>
+</mapper>
